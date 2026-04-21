@@ -1,4 +1,5 @@
--- Painel Gatucho (SCRIPT COMPLETO COM VOO CORRIGIDO NO S)
+-- Painel Gatucho (SCRIPT COMPLETO COM NOCLIP OFF CORRIGIDO)
+
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 
@@ -33,7 +34,7 @@ Instance.new("UICorner", frame)
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1,0,0,30)
 title.BackgroundColor3 = Color3.fromRGB(25,25,25)
-title.Text = "Gatucho hub"
+title.Text = "Gatucho Hub"
 title.TextColor3 = Color3.new(1,1,1)
 title.Parent = frame
 
@@ -60,7 +61,7 @@ local function makeBtn(y,text)
 	return b
 end
 
-local flyBtn = makeBtn(40,"VOAR(não funciona no mobile")
+local flyBtn = makeBtn(40,"VOAR")
 local unflyBtn = makeBtn(80,"NÃO VOAR")
 local tpBtn = makeBtn(120,"TP CLICK: OFF")
 local rejoinBtn = makeBtn(160,"REJOIN SERVER")
@@ -168,6 +169,7 @@ end)
 unflyBtn.MouseButton1Click:Connect(function()
 	flying = false
 	getHumanoid().PlatformStand = false
+
 	if bodyVelocity then bodyVelocity:Destroy() end
 	if bodyGyro then bodyGyro:Destroy() end
 end)
@@ -184,6 +186,14 @@ end)
 noclipBtn.MouseButton1Click:Connect(function()
 	noclip = not noclip
 	noclipBtn.Text = noclip and "NOCLIP: ON" or "NOCLIP: OFF"
+
+	if not noclip then
+		for _,v in pairs(getChar():GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = true
+			end
+		end
+	end
 end)
 
 execBtn.MouseButton1Click:Connect(function()
@@ -193,7 +203,7 @@ execBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- LOOP VOO CORRIGIDO
+-- LOOP
 RunService.RenderStepped:Connect(function()
 	if flying and bodyVelocity and bodyGyro then
 		local cam = workspace.CurrentCamera
@@ -201,23 +211,10 @@ RunService.RenderStepped:Connect(function()
 		local look = cam.CFrame.LookVector
 		local right = cam.CFrame.RightVector
 
-		-- frente sobe/desce pela câmera
-		if UIS:IsKeyDown(Enum.KeyCode.W) then
-			vel += look
-		end
-
-		-- trás sempre invertido total
-		if UIS:IsKeyDown(Enum.KeyCode.S) then
-			vel -= look
-		end
-
-		if UIS:IsKeyDown(Enum.KeyCode.A) then
-			vel -= right
-		end
-
-		if UIS:IsKeyDown(Enum.KeyCode.D) then
-			vel += right
-		end
+		if UIS:IsKeyDown(Enum.KeyCode.W) then vel += look end
+		if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= look end
+		if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= right end
+		if UIS:IsKeyDown(Enum.KeyCode.D) then vel += right end
 
 		if vel.Magnitude > 0 then
 			bodyVelocity.Velocity = vel.Unit * speed
@@ -237,6 +234,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
+-- TP CLICK
 mouse.Button1Down:Connect(function()
 	if clickTp then
 		getRoot().CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0,3,0))
