@@ -1,4 +1,4 @@
--- Painel Gatucho (SCRIPT COMPLETO COM NOCLIP OFF CORRIGIDO)
+-- Painel Gatucho (SCRIPT COMPLETO COM MINIMIZAR CORRIGIDO)
 
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -45,7 +45,9 @@ local function topBtn(txt,x,color)
 	b.Text = txt
 	b.TextColor3 = Color3.new(1,1,1)
 	b.BackgroundColor3 = color
+	b.BorderSizePixel = 0
 	b.Parent = frame
+	Instance.new("UICorner", b)
 	return b
 end
 
@@ -61,7 +63,7 @@ local function makeBtn(y,text)
 	return b
 end
 
-local flyBtn = makeBtn(40,"fly (não funciona no mobile")
+local flyBtn = makeBtn(40,"fly(não funciona no mobile)")
 local unflyBtn = makeBtn(80,"unfly")
 local tpBtn = makeBtn(120,"TP CLICK: OFF")
 local rejoinBtn = makeBtn(160,"REJOIN SERVER")
@@ -74,6 +76,11 @@ nameBox.PlaceholderText = "Nome do player"
 nameBox.Parent = frame
 
 local execBtn = makeBtn(290,"EXECUTAR TP PLAYER")
+
+local buttons = {
+	flyBtn, unflyBtn, tpBtn, rejoinBtn,
+	noclipBtn, nameBox, execBtn
+}
 
 -- FUNÇÕES
 local function getChar(plr)
@@ -99,20 +106,29 @@ local function findPlayer(name)
 	end
 end
 
--- FECHAR / MINIMIZAR
+-- FECHAR
 closeBtn.MouseButton1Click:Connect(function()
 	gui:Destroy()
 end)
 
-local buttons = {flyBtn,unflyBtn,tpBtn,rejoinBtn,noclipBtn,nameBox,execBtn}
-
+-- MINIMIZAR CORRIGIDO
 minBtn.MouseButton1Click:Connect(function()
 	minimized = not minimized
-	frame.Size = minimized and UDim2.new(0,250,0,30) or UDim2.new(0,250,0,400)
-	minBtn.Text = minimized and "+" or "-"
 
-	for _,v in pairs(buttons) do
-		v.Visible = not minimized
+	if minimized then
+		frame.Size = UDim2.new(0,250,0,30)
+		minBtn.Text = "+"
+
+		for _,v in pairs(buttons) do
+			v.Visible = false
+		end
+	else
+		frame.Size = UDim2.new(0,250,0,400)
+		minBtn.Text = "-"
+
+		for _,v in pairs(buttons) do
+			v.Visible = true
+		end
 	end
 end)
 
@@ -234,7 +250,6 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- TP CLICK
 mouse.Button1Down:Connect(function()
 	if clickTp then
 		getRoot().CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0,3,0))
