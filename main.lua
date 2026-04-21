@@ -1,4 +1,4 @@
--- Painel Gatucho (COMPLETO / BONITO / FLY CORRIGIDO)
+-- Painel Gatucho (COMPLETO / UNFLY CORRIGIDO)
 
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -112,8 +112,8 @@ local function makeBtn(y,text)
 	return b
 end
 
-local flyBtn = makeBtn(45,"fly(não funciona no mobile)")
-local unflyBtn = makeBtn(85,"unfly")
+local flyBtn = makeBtn(45,"VOAR(não funciona no mobile)")
+local unflyBtn = makeBtn(85,"NÃO VOAR")
 local tpBtn = makeBtn(125,"TP CLICK: OFF")
 local rejoinBtn = makeBtn(165,"REJOIN SERVER")
 local noclipBtn = makeBtn(205,"NOCLIP: OFF")
@@ -142,42 +142,27 @@ local buttons = {
 	noclipBtn, nameBox, execBtn
 }
 
---====================
 -- FECHAR
---====================
-
 closeBtn.MouseButton1Click:Connect(function()
 	gui:Destroy()
 end)
 
---====================
 -- MINIMIZAR
---====================
-
 minBtn.MouseButton1Click:Connect(function()
 	minimized = not minimized
 
 	if minimized then
 		frame.Size = UDim2.new(0,270,0,35)
 		minBtn.Text = "+"
-
-		for _,v in pairs(buttons) do
-			v.Visible = false
-		end
+		for _,v in pairs(buttons) do v.Visible = false end
 	else
 		frame.Size = UDim2.new(0,270,0,410)
 		minBtn.Text = "-"
-
-		for _,v in pairs(buttons) do
-			v.Visible = true
-		end
+		for _,v in pairs(buttons) do v.Visible = true end
 	end
 end)
 
---====================
 -- ARRASTAR
---====================
-
 local dragging = false
 local dragStart
 local startPos
@@ -201,7 +186,6 @@ end)
 UIS.InputChanged:Connect(function(input)
 	if dragging then
 		local delta = input.Position - dragStart
-
 		frame.Position = UDim2.new(
 			startPos.X.Scale,
 			startPos.X.Offset + delta.X,
@@ -211,18 +195,14 @@ UIS.InputChanged:Connect(function(input)
 	end
 end)
 
---====================
 -- BOTÕES
---====================
-
 flyBtn.MouseButton1Click:Connect(function()
 	if flying then return end
 	flying = true
 
-	local root = getRoot()
 	local hum = getHumanoid()
+	local root = getRoot()
 
-	hum.PlatformStand = false
 	hum:ChangeState(Enum.HumanoidStateType.Physics)
 
 	bodyVelocity = Instance.new("BodyVelocity")
@@ -237,12 +217,22 @@ flyBtn.MouseButton1Click:Connect(function()
 	bodyGyro.Parent = root
 end)
 
+-- UNFLY CORRIGIDO
 unflyBtn.MouseButton1Click:Connect(function()
 	flying = false
-	getHumanoid().PlatformStand = false
 
 	if bodyVelocity then bodyVelocity:Destroy() bodyVelocity=nil end
 	if bodyGyro then bodyGyro:Destroy() bodyGyro=nil end
+
+	local hum = getHumanoid()
+
+	hum.PlatformStand = false
+	hum.AutoRotate = true
+	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+	task.wait(0.2)
+
+	hum:ChangeState(Enum.HumanoidStateType.Running)
 end)
 
 tpBtn.MouseButton1Click:Connect(function()
@@ -274,10 +264,7 @@ execBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
---====================
 -- LOOP
---====================
-
 RunService.RenderStepped:Connect(function()
 
 	if flying and bodyVelocity and bodyGyro then
@@ -310,10 +297,6 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 end)
-
---====================
--- TP CLICK
---====================
 
 mouse.Button1Down:Connect(function()
 	if clickTp then
