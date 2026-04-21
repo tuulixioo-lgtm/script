@@ -1,4 +1,4 @@
--- Painel Gatucho (COMPLETO / BONITO / FUNCIONANDO)
+-- Painel Gatucho (COMPLETO / BONITO / FLY CORRIGIDO)
 
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -36,7 +36,6 @@ end
 
 local function findPlayer(name)
 	name = string.lower(name)
-
 	for _,p in pairs(Players:GetPlayers()) do
 		if string.find(string.lower(p.Name),name,1,true)
 		or string.find(string.lower(p.DisplayName),name,1,true) then
@@ -113,8 +112,8 @@ local function makeBtn(y,text)
 	return b
 end
 
-local flyBtn = makeBtn(45,"fly(não funciona no mobile)")
-local unflyBtn = makeBtn(85,"unfly")
+local flyBtn = makeBtn(45,"VOAR")
+local unflyBtn = makeBtn(85,"NÃO VOAR")
 local tpBtn = makeBtn(125,"TP CLICK: OFF")
 local rejoinBtn = makeBtn(165,"REJOIN SERVER")
 local noclipBtn = makeBtn(205,"NOCLIP: OFF")
@@ -220,24 +219,30 @@ flyBtn.MouseButton1Click:Connect(function()
 	if flying then return end
 	flying = true
 
-	getHumanoid().PlatformStand = true
+	local root = getRoot()
+	local hum = getHumanoid()
+
+	hum.PlatformStand = false
+	hum:ChangeState(Enum.HumanoidStateType.Physics)
 
 	bodyVelocity = Instance.new("BodyVelocity")
-	bodyVelocity.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-	bodyVelocity.Parent = getRoot()
+	bodyVelocity.MaxForce = Vector3.new(999999,999999,999999)
+	bodyVelocity.Velocity = Vector3.zero
+	bodyVelocity.Parent = root
 
 	bodyGyro = Instance.new("BodyGyro")
-	bodyGyro.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+	bodyGyro.MaxTorque = Vector3.new(999999,999999,999999)
 	bodyGyro.P = 10000
-	bodyGyro.Parent = getRoot()
+	bodyGyro.CFrame = workspace.CurrentCamera.CFrame
+	bodyGyro.Parent = root
 end)
 
 unflyBtn.MouseButton1Click:Connect(function()
 	flying = false
 	getHumanoid().PlatformStand = false
 
-	if bodyVelocity then bodyVelocity:Destroy() end
-	if bodyGyro then bodyGyro:Destroy() end
+	if bodyVelocity then bodyVelocity:Destroy() bodyVelocity=nil end
+	if bodyGyro then bodyGyro:Destroy() bodyGyro=nil end
 end)
 
 tpBtn.MouseButton1Click:Connect(function()
@@ -264,7 +269,6 @@ end)
 
 execBtn.MouseButton1Click:Connect(function()
 	local target = findPlayer(nameBox.Text)
-
 	if target and target ~= player then
 		getRoot().CFrame = getRoot(target).CFrame * CFrame.new(0,0,-3)
 	end
@@ -286,6 +290,8 @@ RunService.RenderStepped:Connect(function()
 		if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= look end
 		if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= right end
 		if UIS:IsKeyDown(Enum.KeyCode.D) then vel += right end
+		if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0,1,0) end
+		if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then vel -= Vector3.new(0,1,0) end
 
 		if vel.Magnitude > 0 then
 			bodyVelocity.Velocity = vel.Unit * speed
