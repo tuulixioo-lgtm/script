@@ -112,8 +112,8 @@ local function makeBtn(y,text)
 	return b
 end
 
-local flyBtn = makeBtn(45,"VOAR")
-local unflyBtn = makeBtn(85,"NÃO VOAR")
+local flyBtn = makeBtn(45,"fly(não funciona no mobile)")
+local unflyBtn = makeBtn(85,"unfly")
 local tpBtn = makeBtn(125,"TP CLICK: OFF")
 local rejoinBtn = makeBtn(165,"REJOIN SERVER")
 local noclipBtn = makeBtn(205,"NOCLIP: OFF")
